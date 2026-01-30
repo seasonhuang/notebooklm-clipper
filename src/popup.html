@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotebookLM Clipper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 NotebookLM Clipper</h1>
+    </header>
+
+    <!-- NotebookLM 连接状态 -->
+    <div id="connection-section" class="section">
+      <div id="connection-status" class="status-bar">
+        <span class="status-icon">⏳</span>
+        <span class="status-text">检查 NotebookLM 连接...</span>
+      </div>
+    </div>
+
+    <!-- 内容预览 -->
+    <div id="content-section" class="section">
+      <div class="preview-header">
+        <h3 id="page-title">加载中...</h3>
+        <span id="char-count" class="badge">0 字</span>
+      </div>
+      <div id="content-preview" class="preview-box">
+        正在提取网页内容...
+      </div>
+    </div>
+
+    <!-- 笔记本选择 -->
+    <div id="notebook-section" class="section">
+      <label for="notebook-select">选择笔记本：</label>
+      <div class="select-wrapper">
+        <select id="notebook-select">
+          <option value="">-- 加载中 --</option>
+        </select>
+        <button id="refresh-btn" class="btn btn-icon" title="刷新笔记本列表">🔄</button>
+      </div>
+      
+      <!-- 创建新笔记本 -->
+      <label class="checkbox-label">
+        <input type="checkbox" id="create-new-checkbox">
+        <span>创建新笔记本</span>
+      </label>
+      <div id="new-notebook" class="hidden">
+        <input type="text" id="new-notebook-name" placeholder="输入新笔记本名称">
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div id="action-section" class="section">
+      <button id="import-btn" class="btn btn-primary btn-large">
+        📥 一键导入到 NotebookLM
+      </button>
+      <div class="btn-row">
+        <button id="open-nlm-btn" class="btn btn-secondary">🔗 打开 NotebookLM</button>
+        <button id="copy-btn" class="btn btn-secondary">📋 复制内容</button>
+      </div>
+      <div class="btn-row">
+        <button id="dump-logs-btn" class="btn btn-secondary">🧾 复制导入日志</button>
+        <button id="dump-reqs-btn" class="btn btn-secondary">🛰️ 复制请求日志</button>
+      </div>
+    </div>
+
+    <!-- 状态消息 -->
+    <div id="status" class="status hidden"></div>
+
+    <!-- 设置 -->
+    <details class="settings">
+      <summary>⚙️ 提取设置</summary>
+      <div class="settings-content">
+        <label class="checkbox-label">
+          <input type="checkbox" id="include-images" checked>
+          <span>包含图片描述</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="include-links" checked>
+          <span>保留链接</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="clean-mode">
+          <span>简洁模式（仅正文）</span>
+        </label>
+      </div>
+    </details>
+
+    <details class="help">
+      <summary>❓ 使用说明</summary>
+      <div class="help-content">
+        <p><strong>提示：</strong>如果导入失败，点「复制导入日志」把内容发我，我能快速定位是点错按钮/找错输入框/弹窗结构变化。</p>
+      </div>
+    </details>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
