@@ -17,8 +17,6 @@ const elements = {
   includeImages: document.getElementById('include-images'),
   includeLinks: document.getElementById('include-links'),
   cleanMode: document.getElementById('clean-mode'),
-  dumpLogsBtn: document.getElementById('dump-logs-btn'),
-  dumpReqsBtn: document.getElementById('dump-reqs-btn')
 };
 
 let currentContent = null;
@@ -285,37 +283,6 @@ elements.copyBtn.addEventListener('click', async () => {
     showStatus('✅ 已复制到剪贴板！', 'success');
   }
 });
-
-// 复制 NotebookLM 注入脚本日志
-if (elements.dumpLogsBtn) {
-  elements.dumpLogsBtn.addEventListener('click', async () => {
-    try {
-      const res = await sendMessage('dumpNotebookLMLogs');
-      const logs = res.logs || [];
-      const text = logs.map(l => `${l.ts} ${l.url} ${l.msg}`).join('\n');
-      await navigator.clipboard.writeText(text || '(no logs)');
-      showStatus('✅ 已复制导入日志到剪贴板', 'success');
-    } catch (e) {
-      showStatus('❌ 获取日志失败：' + e.message, 'error');
-    }
-  });
-}
-
-// 复制 batchexecute 请求捕获（需要刷新 NotebookLM 页面让 hook 生效）
-if (elements.dumpReqsBtn) {
-  elements.dumpReqsBtn.addEventListener('click', async () => {
-    try {
-      const res = await sendMessage('dumpBatchexecute');
-      const data = res.data || [];
-      const interesting = data.filter(x => (x.url || '').includes('batchexecute'));
-      const text = JSON.stringify(interesting.slice(-20), null, 2);
-      await navigator.clipboard.writeText(text);
-      showStatus('✅ 已复制请求日志（最近20条）', 'success');
-    } catch (e) {
-      showStatus('❌ 获取请求日志失败：' + e.message, 'error');
-    }
-  });
-}
 
 elements.refreshBtn.addEventListener('click', async () => {
   await checkConnection();

@@ -230,67 +230,25 @@ async function handleMessage(request, sender) {
       return { success: true };
     }
 
-    case 'dumpNotebookLMLogs': {
-      const tab = await getNotebookLMTab();
-      if (!tab) throw new Error('请先打开 NotebookLM（用于读取日志）');
-      try {
-        await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/notebooklm-injector.js'] });
-      } catch (e) {}
-      const res = await sendToNotebookLM('dumpLogs', {});
-      return { success: true, logs: res.logs || [] };
-    }
-
-    case 'dumpBatchexecute': {
-      const tab = await getNotebookLMTab();
-      if (!tab) throw new Error('请先打开 NotebookLM（用于抓请求）');
-      // hook 必须 document_start，所以这里只读
-      const res = await new Promise((resolve, reject) => {
-        chrome.tabs.sendMessage(tab.id, { action: 'dumpBatchexecute' }, r => {
-          if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
-          else resolve(r);
-        });
-      });
-      return { success: true, data: res?.data || null };
-    }
-
     case 'importToNotebook': {
       const { notebookId, content, title, createNew, notebookName } = request;
 
-      // ✅ 请求层实现：不依赖 DOM，不依赖当前打开的是哪个 notebook tab
-      try {
-        let targetNotebookId = notebookId;
-        if (createNew) {
-          targetNotebookId = await createNotebookViaRpc(notebookName);
-        }
-        if (!targetNotebookId) {
-          throw new Error('缺少 notebookId（请选择笔记本或创建新的）');
-        }
-
-        // 导入：走 izAoDd
-        await addCopiedTextViaRpc({ notebookId: targetNotebookId, text: content, title });
-
-        return {
-          success: true,
-          notebookId: targetNotebookId,
-          url: `https://notebooklm.google.com/notebook/${targetNotebookId}`
-        };
-      } catch (error) {
-        // 兜底：如果用户已经打开了 NotebookLM，我们仍可尝试 DOM 方式
-        try {
-          const tab = await openNotebookLM(notebookId);
-          await new Promise(r => setTimeout(r, 2500));
-          try {
-            await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/notebooklm-injector.js'] });
-          } catch (e) {}
-          await new Promise(r => setTimeout(r, 800));
-          if (createNew) {
-            return await sendToNotebookLM('createAndAdd', { notebookName, content, title });
-          }
-          return await sendToNotebookLM('addCopiedText', { content, title });
-        } catch (e2) {
-          return { success: false, error: error.message };
-        }
+      let targetNotebookId = notebookId;
+      if (createNew) {
+        targetNotebookId = await createNotebookViaRpc(notebookName);
       }
+      if (!targetNotebookId) {
+        throw new Error('缺少 notebookId（请选择笔记本或创建新的）');
+      }
+
+      // 通过 API 导入
+      await addCopiedTextViaRpc({ notebookId: targetNotebookId, text: content, title });
+
+      return {
+        success: true,
+        notebookId: targetNotebookId,
+        url: `https://notebooklm.google.com/notebook/${targetNotebookId}`
+      };
     }
 
     default:

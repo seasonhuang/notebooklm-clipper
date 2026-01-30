@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "NotebookLM Clipper",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "一键提取网页内容并直接导入到 NotebookLM 笔记本",
   "permissions": [
     "activeTab",
@@ -29,16 +29,6 @@
     {
       "matches": ["<all_urls>"],
       "js": ["src/content.js"],
-      "run_at": "document_idle"
-    },
-    {
-      "matches": ["https://notebooklm.google.com/*"],
-      "js": ["src/notebooklm-hook.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://notebooklm.google.com/*"],
-      "js": ["src/notebooklm-injector.js"],
       "run_at": "document_idle"
     }
   ],
